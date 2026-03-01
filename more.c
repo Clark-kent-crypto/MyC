@@ -2,6 +2,9 @@
 #include<stdio.h>
 #include<SDL3/SDL.h>
 #include<stdlib.h>
+#include<SDL3/SDL_stdinc.h>
+
+
 
 struct sdlapp{
 SDL_Window* window;
@@ -9,12 +12,57 @@ SDL_Renderer* renderer;
  SDL_Surface* surface;
  SDL_Event events;
  SDL_FRect rect;
+ int n;
+ int state_For_Grid;
+ struct particles{
+    SDL_FPoint points[100];
+
+ };
+ struct vector{
+    float x1;
+    float x2;
+    float y1;
+    float y2;
+
+ };
+ 
+
+
 
 int run;
 int a,b;
 
 
 }app;
+struct particles newP;
+struct vector newV;
+void grid();
+void update(struct particles* p){
+    
+    p->points[0].x=0.0f;
+    p->points[0].y=0.0f;
+    newV.x1=0.0f;
+    newV.y1=10.0f;
+    newV.x2=10.0f;
+    newV.y2=0.0f;
+    for(int  i=0;i<100;i++){
+        p->points[i].x=p->points[0].x+i+0.0f;//its updating the location of the points 
+        p->points[i].y=p->points[0].y+i+0.0f;
+    }
+    if(app.events.button.button==SDL_BUTTON_LEFT){
+    app.state_For_Grid=1;
+    }
+    if(app.events.button.button==SDL_BUTTON_RIGHT){
+        app.state_For_Grid=0;
+    }
+
+    if(app.state_For_Grid){
+        grid();
+    }
+    
+}
+
+
 void render(struct sdlapp* a){
   
   a->rect.x=a->events.motion.x-300;
@@ -28,11 +76,7 @@ a->rect.w=300;
      }
         SDL_RenderClear(a->renderer);
         SDL_SetRenderDrawColor(a->renderer,0,0,0,0);
-        // SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x,a->events.motion.y);
-        //  SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x+300.0f,a->events.motion.y);
-        //   SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x,a->events.motion.y+100.0f);
-        //    SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x+300.0f,a->events.motion.y+100.0f);
-        // SDL_RenderClear(a->renderer);
+        
          for(float i=0.0f;i<100.0f;i++){
             SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300,a->events.motion.y-100+i);
          }
@@ -41,6 +85,8 @@ a->rect.w=300;
          for(float i=0.0f;i<300.0f;i++){
             SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300+i,a->events.motion.y-100);
          }
+         update(&newP);
+         SDL_RenderPoints(a->renderer,newP.points,100);
         
          if(!SDL_RenderPresent(a->renderer)){
         SDL_Log("Failed to render");
@@ -102,6 +148,7 @@ void gameloop(struct sdlapp *a){
         SDL_Delay(16.6);
 
        fps++;
+    //    update(&newP);
         input();
         render(&app);
         Uint64 currentTick=SDL_GetTicks();
@@ -114,6 +161,7 @@ int main(){
         return 1;
     }
    app.run=1;
+   app.state_For_Grid=0;
     
     app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
     //  app.surface=SDL_LoadPNG("One.png.png");
@@ -126,6 +174,7 @@ int main(){
     SDL_GetWindowSize(app.window, &app.a, &app.b);
     // printf("a,b:%d,%d",a,b);
     SDL_WarpMouseInWindow(app.window,app.a/2.00,app.b/2.00);//it centers the mouse inside the window 
+    // update(&newP);
    gameloop(&app);
 //    input();
 
@@ -133,4 +182,29 @@ int main(){
 
 SDL_Quit();
     return 0;
+}
+void grid(){
+     for(int i=0;i<2200;i+=10 ){
+        SDL_RenderLine(app.renderer,newV.x1+(i*1.0f),0.0f,newV.x2+(i*1.0f),2200);
+        // newV.y1=newV.y1+(i*1.0f);
+        // newV.x2=+(i*1.0f);
+        // / newV.y2=+(i*1.0f);
+        // newV.x1=+(i*1.0f);/
+        // SDL_RenderLine(app.renderer,0,newV.y1,1200,newV.y2+(i*0.0f));
+        
+         
+
+        
+
+    }
+    newV.x1=0.0f;
+    newV.y1=10.0f;
+    newV.x2=10.0f;
+    newV.y2=0.0f;
+    for(int i=0;i<2200;i+=10){
+         SDL_RenderLine(app.renderer,0,newV.y1+(i*1.0f),2200,newV.y2+(i*1.0f));
+    }
+    
+  
+
 }
