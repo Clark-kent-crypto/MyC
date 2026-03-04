@@ -13,9 +13,10 @@ SDL_Renderer* renderer;
  SDL_Event events;
  SDL_FRect rect;
  int n;
+ int j;
  int state_For_Grid;
  struct particles{
-    SDL_FPoint points[100];
+    SDL_FPoint points[1000];
 
  };
  struct vector{
@@ -31,24 +32,46 @@ SDL_Renderer* renderer;
 
 int run;
 int a,b;
+int speed;
+int motionState;
 
 
 }app;
 struct particles newP;
 struct vector newV;
 void grid();
+void renderParticles(struct particles* p);
 void update(struct particles* p){
+    app.speed=5;
     
-    p->points[0].x=0.0f;
-    p->points[0].y=0.0f;
+   p->points[0].x=app.events.motion.x;
+    p->points[0].y=app.events.motion.y; 
     newV.x1=0.0f;
     newV.y1=10.0f;
     newV.x2=10.0f;
     newV.y2=0.0f;
-    for(int  i=0;i<100;i++){
-        p->points[i].x=p->points[0].x+i+0.0f;//its updating the location of the points 
-        p->points[i].y=p->points[0].y+i+0.0f;
-    }
+    // renderParticles(p);
+    
+     for(int  i=0;i<1000;i++){
+       p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
+        p->points[i].y=SDL_rand(100)*1.0f+(app.j*1.0f);
+    
+    
+}
+if(app.j>=500){
+    app.motionState=1;
+
+}
+if(app.motionState==1){
+       for(int  i=0;i<1000;i++){
+       p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
+        p->points[i].y=SDL_rand(100)*1.0f+(app.j*1.0f);
+}
+
+}
+
+ 
+   
     if(app.events.button.button==SDL_BUTTON_LEFT){
     app.state_For_Grid=1;
     }
@@ -64,6 +87,8 @@ void update(struct particles* p){
 
 
 void render(struct sdlapp* a){
+    
+
   
   a->rect.x=a->events.motion.x-300;
   a->rect.y=a->events.motion.y-100;
@@ -86,7 +111,8 @@ a->rect.w=300;
             SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300+i,a->events.motion.y-100);
          }
          update(&newP);
-         SDL_RenderPoints(a->renderer,newP.points,100);
+         SDL_SetRenderDrawColor(a->renderer,0,0,0,0);
+         SDL_RenderPoints(a->renderer,newP.points,1000);
         
          if(!SDL_RenderPresent(a->renderer)){
         SDL_Log("Failed to render");
@@ -153,7 +179,17 @@ void gameloop(struct sdlapp *a){
         render(&app);
         Uint64 currentTick=SDL_GetTicks();
         frameCount(&app,&fps,&fpS,&lastTick,&currentTick);
+        if(a->j<500){
+    a->j+=app.speed;
     }
+    if(app.motionState==1){
+        if(a->j>0){
+            a->j-=app.speed;
+        }
+    }
+    
+    }
+    
 }
 int main(){
     if(!SDL_Init(SDL_INIT_VIDEO)){
@@ -162,6 +198,8 @@ int main(){
     }
    app.run=1;
    app.state_For_Grid=0;
+   app.motionState=0;
+    app.j=0;
     
     app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
     //  app.surface=SDL_LoadPNG("One.png.png");
@@ -190,11 +228,7 @@ void grid(){
         // newV.x2=+(i*1.0f);
         // / newV.y2=+(i*1.0f);
         // newV.x1=+(i*1.0f);/
-        // SDL_RenderLine(app.renderer,0,newV.y1,1200,newV.y2+(i*0.0f));
-        
-         
-
-        
+        // SDL_RenderLine(app.renderer,0,newV.y1,1200,newV.y2+(i*0.0f)); 
 
     }
     newV.x1=0.0f;
@@ -204,7 +238,15 @@ void grid(){
     for(int i=0;i<2200;i+=10){
          SDL_RenderLine(app.renderer,0,newV.y1+(i*1.0f),2200,newV.y2+(i*1.0f));
     }
-    
+   
   
 
+}
+void renderParticles(struct particles* p){
+       for(int j=0;j<500;j++){
+    for(int  i=0;i<1000;i++){
+       p->points[i].x=SDL_rand(100)*1.0f+(j*1.0f);//its updating the location of the points 
+        p->points[i].y=SDL_rand(100)*1.0f;
+    } 
+}
 }
