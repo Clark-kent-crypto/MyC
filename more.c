@@ -58,17 +58,14 @@ void update(struct particles* p){
     
     
 }
-if(app.j>=500){
-    app.motionState=1;
 
-}
-if(app.motionState==1){
-       for(int  i=0;i<1000;i++){
-       p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
-        p->points[i].y=SDL_rand(100)*1.0f+(app.j*1.0f);
-}
+// if(app.motionState==1){
+//        for(int  i=0;i<1000;i++){
+//        p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
+//         p->points[i].y=SDL_rand(100)*1.0f+(app.j*1.0f);
+// }
 
-}
+// }
 
  
    
@@ -179,9 +176,15 @@ void gameloop(struct sdlapp *a){
         render(&app);
         Uint64 currentTick=SDL_GetTicks();
         frameCount(&app,&fps,&fpS,&lastTick,&currentTick);
+        if(!app.motionState){
         if(a->j<500){
     a->j+=app.speed;
     }
+}
+    if(app.j>=500){
+    app.motionState=1;
+
+}
     if(app.motionState==1){
         if(a->j>0){
             a->j-=app.speed;
