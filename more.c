@@ -14,6 +14,9 @@ SDL_Renderer* renderer;
  SDL_FRect rect;
  int n;
  int j;
+ int yInc;
+ int xInc;
+ int state_for_revert;
  int state_For_Grid;
  struct particles{
     SDL_FPoint points[1000];
@@ -41,8 +44,9 @@ struct particles newP;
 struct vector newV;
 void grid();
 void renderParticles(struct particles* p);
+void revert(struct sdlapp* a);
 void update(struct particles* p){
-    app.speed=5;
+    app.speed=10;
     
    p->points[0].x=app.events.motion.x;
     p->points[0].y=app.events.motion.y; 
@@ -54,18 +58,30 @@ void update(struct particles* p){
     
      for(int  i=0;i<1000;i++){
        p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
-        p->points[i].y=SDL_rand(100)*1.0f+(app.j*1.0f);
+        p->points[i].y=SDL_rand(100)*1.0f+(app.yInc*1.0f);
     
     
 }
+  if(app.events.type=SDL_EVENT_KEY_DOWN ){
+            if(app.events.key.key==SDLK_LCTRL){
+                app.speed+=10;
+                SDL_Log("ctrl was pressed");
+            }
+            else if(app.events.key.key==SDLK_D ){
+                app.j+=200;
+            }
+             else if(app.events.key.key==SDLK_A ){
+                app.j-=200;
+            }
+            else if(app.events.key.key==SDLK_S){
+                app.yInc+=200;
+            }
+              else if(app.events.key.key==SDLK_W){
+                app.yInc-=200;
+            }
+        }
 
-// if(app.motionState==1){
-//        for(int  i=0;i<1000;i++){
-//        p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
-//         p->points[i].y=SDL_rand(100)*1.0f+(app.j*1.0f);
-// }
 
-// }
 
  
    
@@ -145,7 +161,9 @@ void input(){
                 SDL_Log("The left button was pressed");
             }
         }
+        
         }
+        
 
     
 
@@ -163,7 +181,7 @@ void frameCount(struct sdlapp* a,int *fps,char(*fpS)[],Uint64 *tick,Uint64* tick
         }
 
 }
-void gameloop(struct sdlapp *a){
+void gameloop(struct sdlapp *a,struct particles* p){
     int fps=0;
     char fpS[25];
     Uint64 lastTick=0;
@@ -176,24 +194,46 @@ void gameloop(struct sdlapp *a){
         render(&app);
         Uint64 currentTick=SDL_GetTicks();
         frameCount(&app,&fps,&fpS,&lastTick,&currentTick);
-        if(!app.motionState){
-        if(a->j<500){
+        if(!app.motionState){//this code only runs when the motion state is 0 
+        if(a->j<600||newP.points[1000].y<600.0f){// it handles the movement of x
     a->j+=app.speed;
+    
+    }
+     if(a->yInc<600||newP.points[1000].y<600.0f){//it handles the movement of y
+    
+    a->yInc+=app.speed;
     }
 }
-    if(app.j>=500){
+    if(app.j>=500){//it changes the motion state to 1
     app.motionState=1;
 
 }
-    if(app.motionState==1){
-        if(a->j>0){
-            a->j-=app.speed;
-        }
-    }
-    
-    }
-    
+// else if(newP.points[1000].x<600){
+//     app.motionState=0;
+// }
+
+if(a->events.type==SDL_EVENT_KEY_DOWN){//if pressed right control button the object will return to its initial position
+if(a->events.key.key==SDLK_RCTRL){
+a->state_for_revert=1;
 }
+}
+if(a->state_for_revert){
+    revert(&app);
+}
+if(app.j==0&&app.yInc==0){
+    a->state_for_revert=0;//it stops revert once its back to its old position
+}
+
+
+
+}
+    
+
+
+
+}
+
+
 int main(){
     if(!SDL_Init(SDL_INIT_VIDEO)){
         SDL_Log("failed");
@@ -201,8 +241,11 @@ int main(){
     }
    app.run=1;
    app.state_For_Grid=0;
+   app.state_for_revert=0;
    app.motionState=0;
     app.j=0;
+    app.yInc=0;
+    app.xInc=0;
     
     app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
     //  app.surface=SDL_LoadPNG("One.png.png");
@@ -216,7 +259,7 @@ int main(){
     // printf("a,b:%d,%d",a,b);
     SDL_WarpMouseInWindow(app.window,app.a/2.00,app.b/2.00);//it centers the mouse inside the window 
     // update(&newP);
-   gameloop(&app);
+   gameloop(&app,&newP);
 //    input();
 
 
@@ -252,4 +295,15 @@ void renderParticles(struct particles* p){
         p->points[i].y=SDL_rand(100)*1.0f;
     } 
 }
+}
+void revert(struct sdlapp* a){
+     if(app.motionState==1){
+        if(a->j>0){
+            a->j-=app.speed;
+        }
+        if(a->yInc>0){
+            a->yInc-=app.speed;
+        }
+    }
+
 }
