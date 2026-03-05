@@ -41,43 +41,47 @@ int motionState;
 
 }app;
 struct particles newP;
+struct particles newp;
 struct vector newV;
 void grid();
-void renderParticles(struct particles* p);
+void renderParticles(struct particles* p,int a,int b);
 void revert(struct sdlapp* a);
+void particleDeclare(struct particles* p);
 void update(struct particles* p){
-    app.speed=10;
+    app.speed=5;
     
-   p->points[0].x=app.events.motion.x;
-    p->points[0].y=app.events.motion.y; 
+
+particleDeclare(p);
+particleDeclare(&newp);
     newV.x1=0.0f;
     newV.y1=10.0f;
     newV.x2=10.0f;
     newV.y2=0.0f;
-    // renderParticles(p);
+    renderParticles(p,25,37.5);
+    renderParticles(&newp,100,0);
     
-     for(int  i=0;i<1000;i++){
-       p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
-        p->points[i].y=SDL_rand(100)*1.0f+(app.yInc*1.0f);
+//      for(int  i=0;i<1000;i++){
+//        p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
+//         p->points[i].y=SDL_rand(100)*1.0f+(app.yInc*1.0f);
     
     
-}
+// }
   if(app.events.type=SDL_EVENT_KEY_DOWN ){
             if(app.events.key.key==SDLK_LCTRL){
                 app.speed+=10;
                 SDL_Log("ctrl was pressed");
             }
             else if(app.events.key.key==SDLK_D ){
-                app.j+=200;
+                app.j+=100;
             }
              else if(app.events.key.key==SDLK_A ){
-                app.j-=200;
+                app.j-=100;
             }
             else if(app.events.key.key==SDLK_S){
-                app.yInc+=200;
+                app.yInc+=100;
             }
               else if(app.events.key.key==SDLK_W){
-                app.yInc-=200;
+                app.yInc-=100;
             }
         }
 
@@ -95,6 +99,7 @@ void update(struct particles* p){
     if(app.state_For_Grid){
         grid();
     }
+    SDL_RenderPoints(app.renderer,newP.points,1000);
     
 }
 
@@ -115,17 +120,20 @@ a->rect.w=300;
         SDL_RenderClear(a->renderer);
         SDL_SetRenderDrawColor(a->renderer,0,0,0,0);
         
-         for(float i=0.0f;i<100.0f;i++){
-            SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300,a->events.motion.y-100+i);
-         }
-         SDL_RenderRect(a->renderer,&a->rect);
+        //  for(float i=0.0f;i<100.0f;i++){
+        //     SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300,a->events.motion.y-100+i);
+        //  }
+        //  SDL_RenderRect(a->renderer,&a->rect);
          SDL_SetRenderDrawColor(a->renderer,255,255,255,255);
-         for(float i=0.0f;i<300.0f;i++){
-            SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300+i,a->events.motion.y-100);
-         }
-         update(&newP);
+        //  for(float i=0.0f;i<300.0f;i++){
+        //     SDL_RenderLine(a->renderer,0.0f,0.0f,a->events.motion.x-300+i,a->events.motion.y-100);
+        //  }
+         
+         
          SDL_SetRenderDrawColor(a->renderer,0,0,0,0);
-         SDL_RenderPoints(a->renderer,newP.points,1000);
+        //  SDL_RenderPoints(a->renderer,newP.points,1000);
+        update(&newP);
+         SDL_RenderPoints(a->renderer,newp.points,1000);
         
          if(!SDL_RenderPresent(a->renderer)){
         SDL_Log("Failed to render");
@@ -206,6 +214,7 @@ void gameloop(struct sdlapp *a,struct particles* p){
 }
     if(app.j>=500){//it changes the motion state to 1
     app.motionState=1;
+   
 
 }
 // else if(newP.points[1000].x<600){
@@ -220,9 +229,11 @@ a->state_for_revert=1;
 if(a->state_for_revert){
     revert(&app);
 }
-if(app.j==0&&app.yInc==0){
+if(app.j<=0&&app.yInc<=0){
     a->state_for_revert=0;//it stops revert once its back to its old position
 }
+
+
 
 
 
@@ -288,11 +299,11 @@ void grid(){
   
 
 }
-void renderParticles(struct particles* p){
+void renderParticles(struct particles* p,int a,int b){
        for(int j=0;j<500;j++){
     for(int  i=0;i<1000;i++){
-       p->points[i].x=SDL_rand(100)*1.0f+(j*1.0f);//its updating the location of the points 
-        p->points[i].y=SDL_rand(100)*1.0f;
+       p->points[i].x=SDL_rand(a)*1.0f+(app.j*1.0f)+(b*1.0f);//its updating the location of the points 
+        p->points[i].y=SDL_rand(a)*1.0f+(app.yInc*1.0f)+(b*1.0f);
     } 
 }
 }
@@ -305,5 +316,10 @@ void revert(struct sdlapp* a){
             a->yInc-=app.speed;
         }
     }
+
+}
+void particleDeclare(struct particles* p){
+    p->points[0].x=app.events.motion.x;
+    p->points[0].y=app.events.motion.y;
 
 }
