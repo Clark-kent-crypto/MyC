@@ -18,6 +18,7 @@ SDL_Renderer* renderer;
  int xInc;
  int state_for_revert;
  int state_For_Grid;
+ Uint64 dT;
  struct particles{
     SDL_FPoint points[1000];
 
@@ -42,13 +43,14 @@ int motionState;
 }app;
 struct particles newP;
 struct particles newp;
+struct particles new2p;
 struct vector newV;
 void grid();
 void renderParticles(struct particles* p,int a,int b);
 void revert(struct sdlapp* a);
 void particleDeclare(struct particles* p);
 void update(struct particles* p){
-    app.speed=5;
+    app.speed=1*app.dT;
     
 
 particleDeclare(p);
@@ -57,8 +59,9 @@ particleDeclare(&newp);
     newV.y1=10.0f;
     newV.x2=10.0f;
     newV.y2=0.0f;
-    renderParticles(p,25,37.5);
-    renderParticles(&newp,100,0);
+    renderParticles(p,25,87.5);
+    renderParticles(&newp,100,50);
+    renderParticles(&new2p,200,0);
     
 //      for(int  i=0;i<1000;i++){
 //        p->points[i].x=SDL_rand(100)*1.0f+(app.j*1.0f);//its updating the location of the points 
@@ -134,6 +137,7 @@ a->rect.w=300;
         //  SDL_RenderPoints(a->renderer,newP.points,1000);
         update(&newP);
          SDL_RenderPoints(a->renderer,newp.points,1000);
+         SDL_RenderPoints(a->renderer,new2p.points,1000);
         
          if(!SDL_RenderPresent(a->renderer)){
         SDL_Log("Failed to render");
@@ -167,6 +171,7 @@ void input(){
         else if(app.events.type==SDL_EVENT_MOUSE_BUTTON_DOWN){
             if(app.events.button.button==SDL_BUTTON_LEFT  ){
                 SDL_Log("The left button was pressed");
+                
             }
         }
         
@@ -177,6 +182,7 @@ void input(){
 
 }
 void frameCount(struct sdlapp* a,int *fps,char(*fpS)[],Uint64 *tick,Uint64* tick2){
+   
     if(*tick2>*(tick)+1000){//That gives the milisecond passed since the start of sdlinit
             // SDL_SetWindowTitle(a->window,)
 
@@ -187,21 +193,26 @@ void frameCount(struct sdlapp* a,int *fps,char(*fpS)[],Uint64 *tick,Uint64* tick
            SDL_SetWindowTitle(a->window,*(fpS));
             *fps=0;//This is to reset the timer each second so we get only the value in that 1 sec timefframe
         }
+        
 
 }
 void gameloop(struct sdlapp *a,struct particles* p){
     int fps=0;
     char fpS[25];
     Uint64 lastTick=0;
+     Uint64 lasttick=0;
     while(a->run){
-        SDL_Delay(16.6);
+        // SDL_Delay(16.6);
 
        fps++;
     //    update(&newP);
         input();
         render(&app);
         Uint64 currentTick=SDL_GetTicks();
+        app.dT=currentTick-lasttick;
+        
         frameCount(&app,&fps,&fpS,&lastTick,&currentTick);
+        lasttick=currentTick;
         if(!app.motionState){//this code only runs when the motion state is 0 
         if(a->j<600||newP.points[1000].y<600.0f){// it handles the movement of x
     a->j+=app.speed;
