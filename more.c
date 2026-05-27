@@ -7,18 +7,18 @@
 
 
 struct sdlapp{
-SDL_Window* window;
-SDL_Renderer* renderer;
- SDL_Surface* surface;
- SDL_Event events;
+SDL_Window* window;//pointer to window where SDL_GetWindow return values is given
+SDL_Renderer* renderer;//pointer to a renderer where you create a renderer
+ SDL_Surface* surface;//pointer to a surface
+ SDL_Event events;//event handles every event
  SDL_FRect rect;
  int n;
- int j;
- int yInc;
- int xInc;
- int state_for_revert;
- int state_For_Grid;
- Uint64 dT;
+ int j;//its a variable that handles the change in x axis
+ int yInc;//its similar to j but for y axis
+ int xInc;//its same as j but i am too lazy to change it all the way so its still empty
+ int state_for_revert;//does what its writter its just a variable that changes the state when to use revert
+ int state_For_Grid;//again does what its writtern its a variable responsible to check when to render grid and when not to 0 as a flase state 1 as a true state
+ Uint64 dT;//its delta time 
  struct particles{
     SDL_FPoint points[1000];
 
@@ -26,7 +26,7 @@ SDL_Renderer* renderer;
  struct vector{
     float x1;
     float x2;
-    float y1;
+    float y1;//its to make the grid 
     float y2;
 
  };
@@ -34,22 +34,23 @@ SDL_Renderer* renderer;
 
 
 
-int run;
-int a,b;
-int speed;
-int motionState;
+int run;//responsible to maintain the gameloop
+int a,b;//it has something to do with renderParticles fnctionn but i am too lazy to check what it does
+int speed;//responsible to maintain the speed of motion in the initial animation 
+int motionState;//maintain motion state 
 
 
 }app;
-struct particles newP;
-struct particles newp;
-struct particles new2p;
+struct particles newP;//particle system that take controls rectangles or squares
+struct particles newp;//same as newP but for different one 
+struct particles new2p;//   <<same as last>>
 struct vector newV;
-void grid();
-void renderParticles(struct particles* p,int a,int b);
-void revert(struct sdlapp* a);
-void particleDeclare(struct particles* p);
-void update(struct particles* p){
+void app_init(struct sdlapp* a);
+void grid();//declaration for grid function dont think i need to say anything what it does pretty selfexpanatory
+void renderParticles(struct particles* p,int a,int b);//<<pretty selfexplanatory>> render particles
+void revert(struct sdlapp* a);//revert the position back to initial position
+void particleDeclare(struct particles* p);//it practically does nothing made it on a whim
+void update(struct particles* p){//it updates the state every frame 
     app.speed=1*app.dT;
     
 
@@ -69,12 +70,12 @@ particleDeclare(&newp);
     
     
 // }
-  if(app.events.type=SDL_EVENT_KEY_DOWN ){
+  if(app.events.type==SDL_EVENT_KEY_DOWN ){
             if(app.events.key.key==SDLK_LCTRL){
                 app.speed+=10;
                 SDL_Log("ctrl was pressed");
             }
-            else if(app.events.key.key==SDLK_D ){
+            else if(app.events.key.key==SDLK_D ){//codes below these all handles the movement of the object that you control
                 app.j+=100;
             }
              else if(app.events.key.key==SDLK_A ){
@@ -92,14 +93,14 @@ particleDeclare(&newp);
 
  
    
-    if(app.events.button.button==SDL_BUTTON_LEFT){
+    if(app.events.button.button==SDL_BUTTON_LEFT){//chane the state to render the grid 
     app.state_For_Grid=1;
     }
-    if(app.events.button.button==SDL_BUTTON_RIGHT){
+    if(app.events.button.button==SDL_BUTTON_RIGHT){//change the state for derendering the grid
         app.state_For_Grid=0;
     }
 
-    if(app.state_For_Grid){
+    if(app.state_For_Grid){//render the grid
         grid();
     }
     SDL_RenderPoints(app.renderer,newP.points,1000);
@@ -107,7 +108,7 @@ particleDeclare(&newp);
 }
 
 
-void render(struct sdlapp* a){
+void render(struct sdlapp* a){//this is our main render function 
     
 
   
@@ -136,7 +137,9 @@ a->rect.w=300;
          SDL_SetRenderDrawColor(a->renderer,0,0,0,0);
         //  SDL_RenderPoints(a->renderer,newP.points,1000);
         update(&newP);
+        SDL_SetRenderDrawColor(a->renderer,210,210,210,210);
          SDL_RenderPoints(a->renderer,newp.points,1000);
+         SDL_SetRenderDrawColor(a->renderer,250,250,250,250);
          SDL_RenderPoints(a->renderer,new2p.points,1000);
         
          if(!SDL_RenderPresent(a->renderer)){
@@ -261,17 +264,18 @@ int main(){
         SDL_Log("failed");
         return 1;
     }
-   app.run=1;
-   app.state_For_Grid=0;
-   app.state_for_revert=0;
-   app.motionState=0;
-    app.j=0;
-    app.yInc=0;
-    app.xInc=0;
+    app_init(&app);//initializes a lot of app struct variables at the start , creates a window and a renderer
+//    app.run=1;
+//    app.state_For_Grid=0;
+//    app.state_for_revert=0;
+//    app.motionState=0;
+//     app.j=0;
+//     app.yInc=0;
+//     app.xInc=0;
     
-    app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
-    //  app.surface=SDL_LoadPNG("One.png.png");
-     app.renderer=SDL_CreateRenderer(app.window,NULL);
+//     app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
+//     //  app.surface=SDL_LoadPNG("One.png.png");
+//      app.renderer=SDL_CreateRenderer(app.window,NULL);
     // SDL_Event events;
      SDL_KeyboardEvent key;
     const bool* keystate=SDL_GetKeyboardState(NULL);
@@ -332,5 +336,19 @@ void revert(struct sdlapp* a){
 void particleDeclare(struct particles* p){
     p->points[0].x=app.events.motion.x;
     p->points[0].y=app.events.motion.y;
+
+}
+void app_init(struct sdlapp* a){
+      app.run=1;
+   app.state_For_Grid=0;
+   app.state_for_revert=0;
+   app.motionState=0;
+    app.j=0;
+    app.yInc=0;
+    app.xInc=0;
+    
+    app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
+    //  app.surface=SDL_LoadPNG("One.png.png");
+     app.renderer=SDL_CreateRenderer(app.window,NULL);
 
 }
