@@ -265,18 +265,8 @@ int main(){
         return 1;
     }
     app_init(&app);//initializes a lot of app struct variables at the start , creates a window and a renderer
-//    app.run=1;
-//    app.state_For_Grid=0;
-//    app.state_for_revert=0;
-//    app.motionState=0;
-//     app.j=0;
-//     app.yInc=0;
-//     app.xInc=0;
-    
-//     app.window=SDL_CreateWindow("xman",1200,700,SDL_WINDOW_RESIZABLE|SDL_WINDOW_MOUSE_FOCUS);
-//     //  app.surface=SDL_LoadPNG("One.png.png");
-//      app.renderer=SDL_CreateRenderer(app.window,NULL);
-    // SDL_Event events;
+
+//     SDL_Event events;
      SDL_KeyboardEvent key;
     const bool* keystate=SDL_GetKeyboardState(NULL);
     // int run=1;
