@@ -278,10 +278,10 @@ int game_logic(gDt* game){
             printf("                 GAME OVER            \n");
             printf("======================================\n");
             // game->run=0;
-            if(game->plyaer_changeVariable==0){
+            if(game->player_change%2==1){
                 printf("        PLAYER 1 WINS SET           \n");
                 game->playerScore++;
-            }else if(game->plyaer_changeVariable==1){
+            }else if(game->player_change%2==0){
                 printf("        PLAYER 2 WINS SET           \n");
                 game->aiScore++;
             }
