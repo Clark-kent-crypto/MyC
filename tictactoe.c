@@ -105,8 +105,26 @@ int userInp(){
     int choice;
     printf("1.EXIT\n");
     printf("2.CONTINUE\n");
+    while(1){
+    while(1){
     printf("Your Choice :");
-    scanf(" %d",&choice);
+
+    if(scanf(" %d",&choice)==1){
+        break;
+    }
+    while(1){
+        if(getchar()=='\n'){
+            break;
+        }
+    }
+    printf("Invaldi input type\n");
+}
+if(choice==1||choice==2){
+    break;
+}
+printf("Invalid input!!");
+    }
+    
     return choice;
 }
 void rule(){
@@ -123,9 +141,10 @@ int playerInput(gDt* game){
     while(1){
     printf("1.X\n");
     printf("2.O\n");
-    printf("Your choice :");
+    // printf("Your choice :");
     
     while(1){
+        printf("Your choice :");
         if(scanf(" %d",&input_choice)==1){
             if(game->player_chossen_choice==input_choice||game->player_chossen_choice==0){
             break;
@@ -150,12 +169,22 @@ int playerInput(gDt* game){
         game->player_chossen_choice=1;
         break;
     }else{
-        printf("invalid input!!");
+        printf("invalid input!!\n");
         continue;
     }
 }do{
+    while(1){
     printf("Make your move :");
-    scanf(" %d",&player_input);
+    if(scanf(" %d",&player_input)==1){
+        break;
+    }
+    while(1){
+        if(getchar()=='\n'){
+            break;
+        }
+    }
+    printf("Invalid Input type!!\n");
+    }
 }while(!restrict_user_input(game,player_input));
 
     int valid_choices[9]={1,2,3,4,5,6,7,8,9};
@@ -279,10 +308,10 @@ int game_logic(gDt* game){
             printf("======================================\n");
             // game->run=0;
             if(game->player_change%2==1){
-                printf("        PLAYER 1 WINS SET           \n");
+                printf("        PLAYER 1 WINS  ROUND           \n");
                 game->playerScore++;
             }else if(game->player_change%2==0){
-                printf("        PLAYER 2 WINS SET           \n");
+                printf("        PLAYER 2 WINS ROUND          \n");
                 game->aiScore++;
             }
             gameReset(game);
